@@ -1,9 +1,20 @@
-FROM node as builder
-
+FROM node:alpine as builder
 WORKDIR /app
-COPY ./ /app/
 
-RUN npm install
+RUN apk update \
+    && apk add --no-cache \
+        g++ \
+        yasm \
+        make \
+        automake \
+        autoconf \
+        libtool \
+        vips-dev
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . ./
 RUN npm run build
 
 FROM nginx:alpine
